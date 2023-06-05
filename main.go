@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crud_api/modules/account"
 	"crud_api/modules/customers"
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -149,12 +150,19 @@ func main() {
 
 	r := gin.Default()
 	customersHandler := customers.DefaultRequestHandler(db)
-
+	adminsHandler := account.DefaultRequestHandler(db)
+	//Customer
 	r.GET("/customers", customersHandler.Read)
 	r.GET("/customers/:id", customersHandler.ReadID)
 	r.POST("/customers", customersHandler.Create)
 	r.PUT("/customers/:id", customersHandler.Update)
 	r.DELETE("/customers/:id", customersHandler.Delete)
+	//Admin
+	r.GET("/admins", adminsHandler.Read)
+	r.GET("/admins/:id", adminsHandler.ReadID)
+	r.POST("/admins", adminsHandler.Create)
+	r.PUT("/admins/:id", adminsHandler.Update)
+	r.DELETE("/admins/:id", adminsHandler.Delete)
 
 	//request-handler : menerima request, mengirim response
 	//controller : validasi dan transformasi data
