@@ -34,3 +34,6 @@ func (u UseCase) Approval(body Approval, ID string) (*Approval, error) {
 func (u UseCase) Activate(body Activate, ID string) (*Activate, error) {
 	return u.repo.Activate(body, ID)
 }
+func (u UseCase) Login(username string, password string) (*Actors, error) {
+	return u.repo.Login(username, password)
+}

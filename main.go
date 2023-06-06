@@ -165,6 +165,7 @@ func main() {
 	r.PUT("/admins-approval/:id", adminsHandler.Approval)
 	r.PUT("/admins-active/:id", adminsHandler.Activate)
 	r.DELETE("/admins/:id", adminsHandler.Delete)
+	r.POST("/admins/login", adminsHandler.Login)
 
 	//request-handler : menerima request, mengirim response
 	//controller : validasi dan transformasi data

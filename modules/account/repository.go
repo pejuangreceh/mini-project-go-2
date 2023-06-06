@@ -2,6 +2,7 @@ package account
 
 import (
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -92,4 +93,22 @@ func (r Repository) Activate(body Activate, ID string) (*Activate, error) {
 		return nil, update_query
 	}
 	return &activate, err
+}
+func (r Repository) Login(username, password string) (*Actors, error) {
+	var actor Actors
+
+	// Retrieve the actor based on the username
+	err := r.db.Where("username = ?", username).First(&actor).Error
+	if err != nil {
+		return &actor, err
+	}
+
+	// Compare the provided password with the stored hashed password
+	err = bcrypt.CompareHashAndPassword([]byte(actor.Password), []byte(password))
+	if err != nil {
+		return &actor, err
+	}
+
+	// Password is correct, return the actor
+	return &actor, nil
 }

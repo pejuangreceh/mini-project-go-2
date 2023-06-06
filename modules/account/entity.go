@@ -54,3 +54,8 @@ func CheckPassword(password, hashedPassword string) error {
 	// Compare the password with the hashed password
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
+
+type LoginRequest struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}

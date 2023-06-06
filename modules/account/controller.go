@@ -163,3 +163,23 @@ func (c Controller) Activate(body Activate, ID string) (*Activate, error) {
 
 	return activateResponse, nil
 }
+func (c Controller) Login(username string, password string) (*AllResponse, error) {
+	actors, err := c.useCase.Login(username, password)
+	if err != nil {
+		return nil, err
+	}
+
+	res := ActorDataResponse{
+		ID:         uint8(actors.ID),
+		Username:   actors.Username,
+		Password:   actors.Password,
+		RoleID:     actors.RoleID,
+		IsVerified: actors.IsVerified,
+		IsActive:   actors.IsActive,
+	}
+	allres := &AllResponse{
+		Message: "Anda berhasil login",
+	}
+	allres.Data = append(allres.Data, res)
+	return allres, nil
+}
