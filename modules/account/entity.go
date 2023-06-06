@@ -1,6 +1,9 @@
 package account
 
-import "gorm.io/gorm"
+import (
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
+)
 
 type Actors struct {
 	gorm.Model
@@ -36,4 +39,18 @@ func (Activate) TableName() string {
 
 func (Register) TableName() string {
 	return "register" // specify the actual table name here
+}
+func HashPassword(password string) (string, error) {
+	// Generate the hash of the password
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	// Convert the hashed password byte slice to a string
+	hashedPassword := string(hash)
+	return hashedPassword, nil
+}
+func CheckPassword(password, hashedPassword string) error {
+	// Compare the password with the hashed password
+	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }

@@ -20,7 +20,8 @@ func (r Repository) GetAll() ([]Actors, error) {
 }
 
 func (r Repository) Save(actors *Actors) error {
-
+	pass, _ := HashPassword(actors.Password)
+	actors.Password = pass
 	err := r.db.Create(actors).Error
 	fmt.Println("id admin : ", actors.ID)
 	var registerData = Register{
@@ -42,8 +43,9 @@ func (r Repository) FindByID(ID string) ([]Actors, error) {
 func (r Repository) UpdateByID(body Actors, ID string) (*Actors, error) {
 	var actors Actors
 	err := r.db.First(&actors, ID).Error
+	pass, _ := HashPassword(body.Password)
 	actors.Username = body.Username
-	actors.Password = body.Password
+	actors.Password = pass
 	actors.RoleID = body.RoleID
 	actors.IsVerified = body.IsVerified
 	actors.IsActive = body.IsActive
