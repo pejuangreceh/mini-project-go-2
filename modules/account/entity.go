@@ -11,10 +11,24 @@ type Actors struct {
 	IsActive   string `json:"is_active" binding:"required"`
 }
 
+type Approval struct {
+	gorm.Model
+	IsVerified string `json:"is_verified" binding:"required"`
+}
+
+type Activate struct {
+	gorm.Model
+	IsActive string `json:"is_active" binding:"required"`
+}
+
 type Register struct {
 	AdminID      uint8  `json:"admin_id" binding:"required"`
 	SuperAdminID uint8  `json:"superadmin_id" binding:"required"`
 	Status       string `json:"status"`
+}
+
+func (Approval) TableName() string {
+	return "actors" // specify the actual table name here
 }
 
 func (Register) TableName() string {

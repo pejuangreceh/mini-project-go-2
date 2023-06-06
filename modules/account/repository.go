@@ -67,18 +67,15 @@ func (r Repository) DeleteByID(ID string) (*Actors, error) {
 	return &actors, err
 }
 
-//func (r Repository) UpdateByID(body Actors, ID string) (*Actors, error) {
-//	var actors Actors
-//	err := r.db.First(&actors, ID).Error
-//	actors.Username = body.Username
-//	actors.Password = body.Password
-//	actors.RoleID = body.RoleID
-//	actors.IsVerified = body.IsVerified
-//	actors.IsActive = body.IsActive
-//
-//	update_query := r.db.Save(&actors).Error
-//	if update_query != nil {
-//		return nil, update_query
-//	}
-//	return &actors, err
-//}
+func (r Repository) Approval(body Approval, ID string) (*Approval, error) {
+	var approve Approval
+
+	err := r.db.First(&approve, ID).Error
+	approve.IsVerified = body.IsVerified
+
+	update_query := r.db.Save(&approve).Error
+	if update_query != nil {
+		return nil, update_query
+	}
+	return &approve, err
+}

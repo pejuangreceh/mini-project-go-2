@@ -27,3 +27,7 @@ func (u UseCase) Update(body Actors, ID string) (*Actors, error) {
 func (u UseCase) Delete(ID string) (*Actors, error) {
 	return u.repo.DeleteByID(ID)
 }
+
+func (u UseCase) Approval(body Approval, ID string) (*Approval, error) {
+	return u.repo.Approval(body, ID)
+}

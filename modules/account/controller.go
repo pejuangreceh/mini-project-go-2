@@ -147,3 +147,11 @@ func (c Controller) Delete(ID string) (*AllResponse, error) {
 	allres.Data = append(allres.Data, res)
 	return allres, nil
 }
+func (c Controller) Approval(body Approval, ID string) (*Approval, error) {
+	approvalResponse, err := c.useCase.Approval(body, ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return approvalResponse, nil
+}
