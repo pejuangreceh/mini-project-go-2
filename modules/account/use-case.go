@@ -31,3 +31,6 @@ func (u UseCase) Delete(ID string) (*Actors, error) {
 func (u UseCase) Approval(body Approval, ID string) (*Approval, error) {
 	return u.repo.Approval(body, ID)
 }
+func (u UseCase) Activate(body Activate, ID string) (*Activate, error) {
+	return u.repo.Activate(body, ID)
+}

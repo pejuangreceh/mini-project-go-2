@@ -79,3 +79,15 @@ func (r Repository) Approval(body Approval, ID string) (*Approval, error) {
 	}
 	return &approve, err
 }
+func (r Repository) Activate(body Activate, ID string) (*Activate, error) {
+	var activate Activate
+
+	err := r.db.First(&activate, ID).Error
+	activate.IsActive = body.IsActive
+
+	update_query := r.db.Save(&activate).Error
+	if update_query != nil {
+		return nil, update_query
+	}
+	return &activate, err
+}

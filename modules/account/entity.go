@@ -30,6 +30,9 @@ type Register struct {
 func (Approval) TableName() string {
 	return "actors" // specify the actual table name here
 }
+func (Activate) TableName() string {
+	return "actors" // specify the actual table name here
+}
 
 func (Register) TableName() string {
 	return "register" // specify the actual table name here

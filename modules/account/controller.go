@@ -155,3 +155,11 @@ func (c Controller) Approval(body Approval, ID string) (*Approval, error) {
 
 	return approvalResponse, nil
 }
+func (c Controller) Activate(body Activate, ID string) (*Activate, error) {
+	activateResponse, err := c.useCase.Activate(body, ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return activateResponse, nil
+}

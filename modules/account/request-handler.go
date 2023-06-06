@@ -115,3 +115,18 @@ func (h RequestHandler) Approval(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, res)
 }
+func (h RequestHandler) Activate(c *gin.Context) {
+	actor := Activate{}
+	actorID := c.Param("id")
+	if err := c.ShouldBindJSON(&actor); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	fmt.Println(actor)
+	res, err := h.ctrl.Activate(actor, actorID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}
