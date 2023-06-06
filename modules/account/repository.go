@@ -76,10 +76,25 @@ func (r Repository) Approval(body Approval, ID string) (*Approval, error) {
 	err := r.db.First(&approve, ID).Error
 	approve.IsVerified = body.IsVerified
 
-	update_query := r.db.Save(&approve).Error
-	if update_query != nil {
-		return nil, update_query
+	updateQuery := r.db.Save(&approve).Error
+	if updateQuery != nil {
+		return nil, updateQuery
 	}
+
+	// Update the register table
+	var registerData RegisterStatus
+	registerData.AdminID = uint8(body.ID)
+	if body.IsVerified == "true" {
+		registerData.Status = "Verified"
+	} else {
+		registerData.Status = "Not Verified"
+	}
+	fmt.Println(registerData)
+	updateRegisterQuery := r.db.Model(registerData).Where("admin_id = ?", ID).Update("status", registerData.Status).Error
+	if updateRegisterQuery != nil {
+		return nil, updateRegisterQuery
+	}
+
 	return &approve, err
 }
 func (r Repository) Activate(body Activate, ID string) (*Activate, error) {
@@ -91,6 +106,19 @@ func (r Repository) Activate(body Activate, ID string) (*Activate, error) {
 	update_query := r.db.Save(&activate).Error
 	if update_query != nil {
 		return nil, update_query
+	}
+	// Update the register table
+	var registerData RegisterStatus
+	registerData.AdminID = uint8(body.ID)
+	if body.IsActive == "true" {
+		registerData.Status = "Active"
+	} else {
+		registerData.Status = "Inactive"
+	}
+	fmt.Println(registerData)
+	updateRegisterQuery := r.db.Model(registerData).Where("admin_id = ?", ID).Update("status", registerData.Status).Error
+	if updateRegisterQuery != nil {
+		return nil, updateRegisterQuery
 	}
 	return &activate, err
 }

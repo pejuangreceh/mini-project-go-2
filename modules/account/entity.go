@@ -29,6 +29,10 @@ type Register struct {
 	SuperAdminID uint8  `json:"superadmin_id" binding:"required"`
 	Status       string `json:"status"`
 }
+type RegisterStatus struct {
+	AdminID uint8  `json:"admin_id" binding:"required"`
+	Status  string `json:"status" binding:"required"`
+}
 
 func (Approval) TableName() string {
 	return "actors" // specify the actual table name here
@@ -38,6 +42,9 @@ func (Activate) TableName() string {
 }
 
 func (Register) TableName() string {
+	return "register" // specify the actual table name here
+}
+func (RegisterStatus) TableName() string {
 	return "register" // specify the actual table name here
 }
 func HashPassword(password string) (string, error) {
