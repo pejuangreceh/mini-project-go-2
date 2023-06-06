@@ -27,6 +27,7 @@ type ActorDataResponse struct {
 type AllResponse struct {
 	Message string              `json:"message"`
 	Data    []ActorDataResponse `json:"data"`
+	Token   string              `json:"token"`
 }
 
 func (c Controller) Create(body *CreateRequest) (*AllResponse, error) {
@@ -177,8 +178,10 @@ func (c Controller) Login(username string, password string) (*AllResponse, error
 		IsVerified: actors.IsVerified,
 		IsActive:   actors.IsActive,
 	}
+	token, _ := GenerateJWT(res, "rahasia")
 	allres := &AllResponse{
 		Message: "Anda berhasil login",
+		Token:   token,
 	}
 	allres.Data = append(allres.Data, res)
 	return allres, nil

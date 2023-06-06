@@ -1,8 +1,10 @@
 package account
 
 import (
+	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+	"time"
 )
 
 type Actors struct {
@@ -65,4 +67,25 @@ func CheckPassword(password, hashedPassword string) error {
 type LoginRequest struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
+}
+
+func GenerateJWT(res ActorDataResponse, key string) (string, error) {
+	claims := jwt.MapClaims{
+		"id":          res.ID,
+		"username":    res.Username,
+		"role_id":     res.RoleID,
+		"is_verified": res.IsVerified,
+		"is_active":   res.IsActive,
+		"iat":         time.Now().Unix(),
+		"exp":         time.Now().Add(time.Hour * 1).Unix(),
+	}
+	// Tandatangani token dengan kunci rahasia
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signedToken, err := token.SignedString([]byte(key))
+	if err != nil {
+		return "Terjadi Kesalahan", err
+	}
+	return signedToken, nil
+	// Gunakan signedToken seperti yang Anda butuhkan
+	//fmt.Println(signedToken)
 }
