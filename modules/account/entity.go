@@ -10,3 +10,13 @@ type Actors struct {
 	IsVerified string `json:"is_verified" binding:"required"`
 	IsActive   string `json:"is_active" binding:"required"`
 }
+
+type Register struct {
+	AdminID      uint8  `json:"admin_id" binding:"required"`
+	SuperAdminID uint8  `json:"superadmin_id" binding:"required"`
+	Status       string `json:"status"`
+}
+
+func (Register) TableName() string {
+	return "register" // specify the actual table name here
+}

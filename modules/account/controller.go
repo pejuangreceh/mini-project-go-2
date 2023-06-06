@@ -51,7 +51,7 @@ func (c Controller) Create(body *CreateRequest) (*AllResponse, error) {
 		IsActive:   actors.IsActive,
 	}
 	allres := &AllResponse{
-		Message: "Data berhasil diambil",
+		Message: "Data berhasil dibuat",
 	}
 	allres.Data = append(allres.Data, res)
 

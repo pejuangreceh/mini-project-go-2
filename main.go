@@ -162,6 +162,8 @@ func main() {
 	r.GET("/admins/:id", adminsHandler.ReadID)
 	r.POST("/admins", adminsHandler.Create)
 	r.PUT("/admins/:id", adminsHandler.Update)
+	//r.PUT("/admins-approval/:id", adminsHandler.Approval)
+	//r.PUT("/admins-active/:id", adminsHandler.Activate)
 	r.DELETE("/admins/:id", adminsHandler.Delete)
 
 	//request-handler : menerima request, mengirim response

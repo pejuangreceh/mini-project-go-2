@@ -1,6 +1,9 @@
 package account
 
-import "gorm.io/gorm"
+import (
+	"fmt"
+	"gorm.io/gorm"
+)
 
 type Repository struct {
 	db *gorm.DB
@@ -17,7 +20,18 @@ func (r Repository) GetAll() ([]Actors, error) {
 }
 
 func (r Repository) Save(actors *Actors) error {
-	return r.db.Create(actors).Error
+
+	err := r.db.Create(actors).Error
+	fmt.Println("id admin : ", actors.ID)
+	var registerData = Register{
+		AdminID:      uint8(actors.ID),
+		SuperAdminID: uint8(1),
+		Status:       "Not Verified",
+	}
+	r.db.Create(registerData)
+
+	return err
+
 }
 func (r Repository) FindByID(ID string) ([]Actors, error) {
 	var actors []Actors
@@ -52,3 +66,19 @@ func (r Repository) DeleteByID(ID string) (*Actors, error) {
 	}
 	return &actors, err
 }
+
+//func (r Repository) UpdateByID(body Actors, ID string) (*Actors, error) {
+//	var actors Actors
+//	err := r.db.First(&actors, ID).Error
+//	actors.Username = body.Username
+//	actors.Password = body.Password
+//	actors.RoleID = body.RoleID
+//	actors.IsVerified = body.IsVerified
+//	actors.IsActive = body.IsActive
+//
+//	update_query := r.db.Save(&actors).Error
+//	if update_query != nil {
+//		return nil, update_query
+//	}
+//	return &actors, err
+//}
