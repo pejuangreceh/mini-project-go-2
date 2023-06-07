@@ -1,6 +1,9 @@
 package account
 
 import (
+	"crud_api/dto"
+	"crud_api/entities"
+	"crud_api/utility"
 	"fmt"
 	"gorm.io/gorm"
 )
@@ -15,23 +18,8 @@ func NewController(useCase *UseCase) *Controller {
 	}
 }
 
-type ActorDataResponse struct {
-	ID         uint8  `json:"id"`
-	Username   string `json:"username"`
-	Password   string `json:"password"`
-	RoleID     uint8  `json:"role_id"`
-	IsVerified string `json:"is_verified"`
-	IsActive   string `json:"is_active"`
-}
-
-type AllResponse struct {
-	Message string              `json:"message"`
-	Data    []ActorDataResponse `json:"data"`
-	Token   string              `json:"token"`
-}
-
-func (c Controller) Create(body *CreateRequest) (*AllResponse, error) {
-	actors := Actors{
+func (c Controller) Create(body *CreateRequest) (*dto.AllActorResponse, error) {
+	actors := entities.Actors{
 		Model:      gorm.Model{},
 		Username:   body.Username,
 		Password:   body.Password,
@@ -43,7 +31,7 @@ func (c Controller) Create(body *CreateRequest) (*AllResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	res := ActorDataResponse{
+	res := dto.ActorDataResponse{
 		ID:         uint8(actors.ID),
 		Username:   actors.Username,
 		Password:   actors.Password,
@@ -51,7 +39,7 @@ func (c Controller) Create(body *CreateRequest) (*AllResponse, error) {
 		IsVerified: actors.IsVerified,
 		IsActive:   actors.IsActive,
 	}
-	allres := &AllResponse{
+	allres := &dto.AllActorResponse{
 		Message: "Data berhasil dibuat",
 	}
 	allres.Data = append(allres.Data, res)
@@ -60,14 +48,14 @@ func (c Controller) Create(body *CreateRequest) (*AllResponse, error) {
 }
 
 // Get All Data
-func (c Controller) Read() (*AllResponse, error) {
+func (c Controller) Read() (*dto.AllActorResponse, error) {
 	actors, err := c.useCase.Read()
 	if err != nil {
 		return nil, err
 	}
-	res := &AllResponse{}
+	res := &dto.AllActorResponse{}
 	for _, actor := range actors {
-		c := ActorDataResponse{
+		c := dto.ActorDataResponse{
 			ID:         uint8(actor.ID),
 			Username:   actor.Username,
 			Password:   actor.Password,
@@ -81,17 +69,17 @@ func (c Controller) Read() (*AllResponse, error) {
 	return res, nil
 }
 
-func (c Controller) ReadID(ID string) (*AllResponse, error) {
+func (c Controller) ReadID(ID string) (*dto.AllActorResponse, error) {
 	actors, err := c.useCase.ReadID(ID)
 	if err != nil {
 		return nil, err
 	}
 
 	if len(actors) == 0 {
-		return nil, fmt.Errorf("Actors not found")
+		return nil, fmt.Errorf("entities.Actors not found")
 	}
 
-	res := ActorDataResponse{
+	res := dto.ActorDataResponse{
 		ID:         uint8(actors[0].ID),
 		Username:   actors[0].Username,
 		Password:   actors[0].Password,
@@ -99,19 +87,19 @@ func (c Controller) ReadID(ID string) (*AllResponse, error) {
 		IsVerified: actors[0].IsVerified,
 		IsActive:   actors[0].IsActive,
 	}
-	allres := &AllResponse{
+	allres := &dto.AllActorResponse{
 		Message: "Data Admin berhasil diambil",
 	}
 	allres.Data = append(allres.Data, res)
 	return allres, nil
 }
 
-func (c Controller) Update(body Actors, ID string) (*AllResponse, error) {
+func (c Controller) Update(body entities.Actors, ID string) (*dto.AllActorResponse, error) {
 	actors, err := c.useCase.Update(body, ID)
 	if err != nil {
 		return nil, err
 	}
-	res := ActorDataResponse{
+	res := dto.ActorDataResponse{
 		ID:         uint8(actors.ID),
 		Username:   actors.Username,
 		Password:   actors.Password,
@@ -120,20 +108,20 @@ func (c Controller) Update(body Actors, ID string) (*AllResponse, error) {
 		IsActive:   actors.IsActive,
 	}
 
-	allres := &AllResponse{
+	allres := &dto.AllActorResponse{
 		Message: "Data Admin berhasil diupdate",
 	}
 	allres.Data = append(allres.Data, res)
 	return allres, nil
 }
 
-func (c Controller) Delete(ID string) (*AllResponse, error) {
+func (c Controller) Delete(ID string) (*dto.AllActorResponse, error) {
 	actors, err := c.useCase.Delete(ID)
 	if err != nil {
 		return nil, err
 	}
 
-	res := ActorDataResponse{
+	res := dto.ActorDataResponse{
 		ID:         uint8(actors.ID),
 		Username:   actors.Username,
 		Password:   actors.Password,
@@ -142,13 +130,13 @@ func (c Controller) Delete(ID string) (*AllResponse, error) {
 		IsActive:   actors.IsActive,
 	}
 
-	allres := &AllResponse{
+	allres := &dto.AllActorResponse{
 		Message: "Data Admin berhasil dihapus",
 	}
 	allres.Data = append(allres.Data, res)
 	return allres, nil
 }
-func (c Controller) Approval(body Approval, ID string) (*Approval, error) {
+func (c Controller) Approval(body entities.Approval, ID string) (*entities.Approval, error) {
 	approvalResponse, err := c.useCase.Approval(body, ID)
 	if err != nil {
 		return nil, err
@@ -156,7 +144,7 @@ func (c Controller) Approval(body Approval, ID string) (*Approval, error) {
 
 	return approvalResponse, nil
 }
-func (c Controller) Activate(body Activate, ID string) (*Activate, error) {
+func (c Controller) Activate(body entities.Activate, ID string) (*entities.Activate, error) {
 	activateResponse, err := c.useCase.Activate(body, ID)
 	if err != nil {
 		return nil, err
@@ -164,13 +152,13 @@ func (c Controller) Activate(body Activate, ID string) (*Activate, error) {
 
 	return activateResponse, nil
 }
-func (c Controller) Login(username string, password string) (*AllResponse, error) {
+func (c Controller) Login(username string, password string) (*dto.AllActorResponse, error) {
 	actors, err := c.useCase.Login(username, password)
 	if err != nil {
 		return nil, err
 	}
 
-	res := ActorDataResponse{
+	res := dto.ActorDataResponse{
 		ID:         uint8(actors.ID),
 		Username:   actors.Username,
 		Password:   actors.Password,
@@ -178,8 +166,8 @@ func (c Controller) Login(username string, password string) (*AllResponse, error
 		IsVerified: actors.IsVerified,
 		IsActive:   actors.IsActive,
 	}
-	token, _ := GenerateJWT(res, "rahasia")
-	allres := &AllResponse{
+	token, _ := utility.GenerateJWT(res, "rahasia")
+	allres := &dto.AllActorResponse{
 		Message: "Anda berhasil login",
 		Token:   token,
 	}

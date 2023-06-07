@@ -1,6 +1,8 @@
 package customers
 
 import (
+	"crud_api/dto"
+	"crud_api/entities"
 	"fmt"
 	"gorm.io/gorm"
 )
@@ -15,28 +17,15 @@ func NewController(useCase *UseCase) *Controller {
 	}
 }
 
-type CustomerDataResponse struct {
-	ID        uint   `json:"id"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Email     string `json:"email"`
-	Avatar    string `json:"avatar"`
-}
-
-type AllResponse struct {
-	Message string                 `json:"message"`
-	Data    []CustomerDataResponse `json:"data"`
-}
-
 // Get All Data
-func (c Controller) Read() (*AllResponse, error) {
+func (c Controller) Read() (*dto.AllCustomerResponse, error) {
 	customers, err := c.useCase.Read()
 	if err != nil {
 		return nil, err
 	}
-	res := &AllResponse{}
+	res := &dto.AllCustomerResponse{}
 	for _, customer := range customers {
-		c := CustomerDataResponse{
+		c := dto.CustomerDataResponse{
 			ID:        customer.ID,
 			FirstName: customer.FirstName,
 			LastName:  customer.LastName,
@@ -49,8 +38,8 @@ func (c Controller) Read() (*AllResponse, error) {
 	return res, nil
 }
 
-func (c Controller) Create(body *CreateRequest) (*AllResponse, error) {
-	customers := Customers{
+func (c Controller) Create(body *CreateRequest) (*dto.AllCustomerResponse, error) {
+	customers := entities.Customers{
 		Model:     gorm.Model{},
 		FirstName: body.FirstName,
 		LastName:  body.LastName,
@@ -61,21 +50,21 @@ func (c Controller) Create(body *CreateRequest) (*AllResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	res := CustomerDataResponse{
+	res := dto.CustomerDataResponse{
 		ID:        customers.ID,
 		FirstName: customers.FirstName,
 		LastName:  customers.LastName,
 		Email:     customers.Email,
 		Avatar:    customers.Avatar,
 	}
-	allres := &AllResponse{
+	allres := &dto.AllCustomerResponse{
 		Message: "Data berhasil diambil",
 	}
 	allres.Data = append(allres.Data, res)
 
 	return allres, nil
 }
-func (c Controller) ReadID(ID string) (*AllResponse, error) {
+func (c Controller) ReadID(ID string) (*dto.AllCustomerResponse, error) {
 	customers, err := c.useCase.ReadID(ID)
 	if err != nil {
 		return nil, err
@@ -85,26 +74,26 @@ func (c Controller) ReadID(ID string) (*AllResponse, error) {
 		return nil, fmt.Errorf("Customers not found")
 	}
 
-	res := CustomerDataResponse{
+	res := dto.CustomerDataResponse{
 		ID:        customers[0].ID,
 		FirstName: customers[0].FirstName,
 		LastName:  customers[0].LastName,
 		Email:     customers[0].Email,
 		Avatar:    customers[0].Avatar,
 	}
-	allres := &AllResponse{
+	allres := &dto.AllCustomerResponse{
 		Message: "Data berhasil diambil",
 	}
 	allres.Data = append(allres.Data, res)
 	return allres, nil
 }
 
-func (c Controller) Update(body Customers, ID string) (*AllResponse, error) {
+func (c Controller) Update(body entities.Customers, ID string) (*dto.AllCustomerResponse, error) {
 	customers, err := c.useCase.Update(body, ID)
 	if err != nil {
 		return nil, err
 	}
-	res := CustomerDataResponse{
+	res := dto.CustomerDataResponse{
 		ID:        customers.ID,
 		FirstName: customers.FirstName,
 		LastName:  customers.LastName,
@@ -112,20 +101,20 @@ func (c Controller) Update(body Customers, ID string) (*AllResponse, error) {
 		Avatar:    customers.Avatar,
 	}
 
-	allres := &AllResponse{
+	allres := &dto.AllCustomerResponse{
 		Message: "Data berhasil diupdate",
 	}
 	allres.Data = append(allres.Data, res)
 	return allres, nil
 }
 
-func (c Controller) Delete(ID string) (*AllResponse, error) {
+func (c Controller) Delete(ID string) (*dto.AllCustomerResponse, error) {
 	customers, err := c.useCase.Delete(ID)
 	if err != nil {
 		return nil, err
 	}
 
-	res := CustomerDataResponse{
+	res := dto.CustomerDataResponse{
 		ID:        customers.ID,
 		FirstName: customers.FirstName,
 		LastName:  customers.LastName,
@@ -133,7 +122,7 @@ func (c Controller) Delete(ID string) (*AllResponse, error) {
 		Avatar:    customers.Avatar,
 	}
 
-	allres := &AllResponse{
+	allres := &dto.AllCustomerResponse{
 		Message: "Data berhasil dihapus",
 	}
 	allres.Data = append(allres.Data, res)

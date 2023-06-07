@@ -1,6 +1,8 @@
 package account
 
 import (
+	"crud_api/dto"
+	"crud_api/entities"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -76,7 +78,7 @@ func (h RequestHandler) ReadID(c *gin.Context) {
 }
 
 func (h RequestHandler) Update(c *gin.Context) {
-	actor := Actors{}
+	actor := entities.Actors{}
 	actorID := c.Param("id")
 	if err := c.ShouldBindJSON(&actor); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -101,7 +103,7 @@ func (h RequestHandler) Delete(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 func (h RequestHandler) Approval(c *gin.Context) {
-	actor := Approval{}
+	actor := entities.Approval{}
 	actorID := c.Param("id")
 	if err := c.ShouldBindJSON(&actor); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -116,7 +118,7 @@ func (h RequestHandler) Approval(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 func (h RequestHandler) Activate(c *gin.Context) {
-	actor := Activate{}
+	actor := entities.Activate{}
 	actorID := c.Param("id")
 	if err := c.ShouldBindJSON(&actor); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -131,7 +133,7 @@ func (h RequestHandler) Activate(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 func (h RequestHandler) Login(c *gin.Context) {
-	var req LoginRequest
+	var req dto.LoginRequest
 	if err := c.BindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return

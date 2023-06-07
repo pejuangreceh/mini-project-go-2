@@ -1,6 +1,9 @@
 package customers
 
-import "gorm.io/gorm"
+import (
+	"crud_api/entities"
+	"gorm.io/gorm"
+)
 
 type Repository struct {
 	db *gorm.DB
@@ -10,21 +13,21 @@ func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{db: db}
 }
 
-func (r Repository) GetAll() ([]Customers, error) {
-	var customers []Customers
+func (r Repository) GetAll() ([]entities.Customers, error) {
+	var customers []entities.Customers
 	err := r.db.Find(&customers).Error
 	return customers, err
 }
-func (r Repository) Save(customers *Customers) error {
+func (r Repository) Save(customers *entities.Customers) error {
 	return r.db.Create(customers).Error
 }
-func (r Repository) FindByID(ID string) ([]Customers, error) {
-	var customers []Customers
+func (r Repository) FindByID(ID string) ([]entities.Customers, error) {
+	var customers []entities.Customers
 	err := r.db.First(&customers, ID).Error
 	return customers, err
 }
-func (r Repository) UpdateByID(body Customers, ID string) (*Customers, error) {
-	var customers Customers
+func (r Repository) UpdateByID(body entities.Customers, ID string) (*entities.Customers, error) {
+	var customers entities.Customers
 	err := r.db.First(&customers, ID).Error
 	customers.FirstName = body.FirstName
 	customers.LastName = body.LastName
@@ -38,8 +41,8 @@ func (r Repository) UpdateByID(body Customers, ID string) (*Customers, error) {
 	return &customers, err
 }
 
-func (r Repository) DeleteByID(ID string) (*Customers, error) {
-	var customers Customers
+func (r Repository) DeleteByID(ID string) (*entities.Customers, error) {
+	var customers entities.Customers
 	err := r.db.First(&customers, ID).Error
 
 	delete_query := r.db.Delete(&customers).Error

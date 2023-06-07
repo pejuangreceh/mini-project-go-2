@@ -1,6 +1,7 @@
 package customers
 
 import (
+	"crud_api/entities"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -73,7 +74,7 @@ func (h RequestHandler) ReadID(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 func (h RequestHandler) Update(c *gin.Context) {
-	customer := Customers{}
+	customer := entities.Customers{}
 	customerID := c.Param("id")
 	if err := c.ShouldBindJSON(&customer); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

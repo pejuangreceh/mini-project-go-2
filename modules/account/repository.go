@@ -1,6 +1,8 @@
 package account
 
 import (
+	"crud_api/entities"
+	"crud_api/utility"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -14,18 +16,18 @@ func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{db: db}
 }
 
-func (r Repository) GetAll() ([]Actors, error) {
-	var actors []Actors
+func (r Repository) GetAll() ([]entities.Actors, error) {
+	var actors []entities.Actors
 	err := r.db.Find(&actors).Error
 	return actors, err
 }
 
-func (r Repository) Save(actors *Actors) error {
-	pass, _ := HashPassword(actors.Password)
+func (r Repository) Save(actors *entities.Actors) error {
+	pass, _ := utility.HashPassword(actors.Password)
 	actors.Password = pass
 	err := r.db.Create(actors).Error
 	fmt.Println("id admin : ", actors.ID)
-	var registerData = Register{
+	var registerData = entities.Register{
 		AdminID:      uint8(actors.ID),
 		SuperAdminID: uint8(1),
 		Status:       "Not Verified",
@@ -35,16 +37,16 @@ func (r Repository) Save(actors *Actors) error {
 	return err
 
 }
-func (r Repository) FindByID(ID string) ([]Actors, error) {
-	var actors []Actors
+func (r Repository) FindByID(ID string) ([]entities.Actors, error) {
+	var actors []entities.Actors
 	err := r.db.First(&actors, ID).Error
 	return actors, err
 }
 
-func (r Repository) UpdateByID(body Actors, ID string) (*Actors, error) {
-	var actors Actors
+func (r Repository) UpdateByID(body entities.Actors, ID string) (*entities.Actors, error) {
+	var actors entities.Actors
 	err := r.db.First(&actors, ID).Error
-	pass, _ := HashPassword(body.Password)
+	pass, _ := utility.HashPassword(body.Password)
 	actors.Username = body.Username
 	actors.Password = pass
 	actors.RoleID = body.RoleID
@@ -58,8 +60,8 @@ func (r Repository) UpdateByID(body Actors, ID string) (*Actors, error) {
 	return &actors, err
 }
 
-func (r Repository) DeleteByID(ID string) (*Actors, error) {
-	var actors Actors
+func (r Repository) DeleteByID(ID string) (*entities.Actors, error) {
+	var actors entities.Actors
 	err := r.db.First(&actors, ID).Error
 
 	delete_query := r.db.Delete(&actors).Error
@@ -70,8 +72,8 @@ func (r Repository) DeleteByID(ID string) (*Actors, error) {
 	return &actors, err
 }
 
-func (r Repository) Approval(body Approval, ID string) (*Approval, error) {
-	var approve Approval
+func (r Repository) Approval(body entities.Approval, ID string) (*entities.Approval, error) {
+	var approve entities.Approval
 
 	err := r.db.First(&approve, ID).Error
 	approve.IsVerified = body.IsVerified
@@ -82,7 +84,7 @@ func (r Repository) Approval(body Approval, ID string) (*Approval, error) {
 	}
 
 	// Update the register table
-	var registerData RegisterStatus
+	var registerData entities.RegisterStatus
 	registerData.AdminID = uint8(body.ID)
 	if body.IsVerified == "true" {
 		registerData.Status = "Verified"
@@ -97,8 +99,8 @@ func (r Repository) Approval(body Approval, ID string) (*Approval, error) {
 
 	return &approve, err
 }
-func (r Repository) Activate(body Activate, ID string) (*Activate, error) {
-	var activate Activate
+func (r Repository) Activate(body entities.Activate, ID string) (*entities.Activate, error) {
+	var activate entities.Activate
 
 	err := r.db.First(&activate, ID).Error
 	activate.IsActive = body.IsActive
@@ -108,7 +110,7 @@ func (r Repository) Activate(body Activate, ID string) (*Activate, error) {
 		return nil, update_query
 	}
 	// Update the register table
-	var registerData RegisterStatus
+	var registerData entities.RegisterStatus
 	registerData.AdminID = uint8(body.ID)
 	if body.IsActive == "true" {
 		registerData.Status = "Active"
@@ -122,8 +124,8 @@ func (r Repository) Activate(body Activate, ID string) (*Activate, error) {
 	}
 	return &activate, err
 }
-func (r Repository) Login(username, password string) (*Actors, error) {
-	var actor Actors
+func (r Repository) Login(username, password string) (*entities.Actors, error) {
+	var actor entities.Actors
 
 	// Retrieve the actor based on the username
 	err := r.db.Where("username = ?", username).First(&actor).Error
