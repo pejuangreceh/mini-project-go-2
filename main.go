@@ -153,12 +153,22 @@ func main() {
 	r := gin.Default()
 	customersHandler := customers.DefaultRequestHandler(db)
 	adminsHandler := account.DefaultRequestHandler(db)
+	//BasePath := "/"
+	CustomerPath := "/customers"
+	//BasePathGroup := r.Group(BasePath)
+	//CustomerPathGroup := r.Group(CustomerPath, utility.customersHandlerAuth())
+	CustomerPathGroup := r.Group(CustomerPath)
+	CustomerPathGroup.GET("/", customersHandler.Read)
+	CustomerPathGroup.GET("/:id", customersHandler.ReadID)
+	CustomerPathGroup.POST("/", customersHandler.Create)
+	CustomerPathGroup.PUT("/:id", customersHandler.Update)
+	CustomerPathGroup.DELETE("/:id", customersHandler.Delete)
 	//Customer
-	r.GET("/customers", customersHandler.Read)
-	r.GET("/customers/:id", customersHandler.ReadID)
-	r.POST("/customers", customersHandler.Create)
-	r.PUT("/customers/:id", customersHandler.Update)
-	r.DELETE("/customers/:id", customersHandler.Delete)
+	//r.GET("/customers", customersHandler.Read)
+	//r.GET("/customers/:id", customersHandler.ReadID)
+	//r.POST("/customers", customersHandler.Create)
+	//r.PUT("/customers/:id", customersHandler.Update)
+	//r.DELETE("/customers/:id", customersHandler.Delete)
 	//Admin
 	r.GET("/admins", adminsHandler.Read)
 	r.GET("/admins/:id", adminsHandler.ReadID)

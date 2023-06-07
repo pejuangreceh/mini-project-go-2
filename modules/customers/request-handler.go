@@ -1,11 +1,14 @@
 package customers
 
 import (
+	"crud_api/dto"
 	"crud_api/entities"
+	"crud_api/utility"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
+	"strings"
 )
 
 type RequestHandler struct {
@@ -28,10 +31,6 @@ func DefaultRequestHandler(db *gorm.DB) *RequestHandler {
 	)
 }
 
-type ErrorResponse struct {
-	Error string
-}
-
 type CreateRequest struct {
 	FirstName string `json:"first_name" binding:"required"`
 	LastName  string `json:"last_name" binding:"required"`
@@ -43,13 +42,13 @@ func (h RequestHandler) Create(c *gin.Context) {
 	var req CreateRequest
 
 	if err := c.BindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: err.Error()})
 		return
 	}
 
 	res, err := h.ctrl.Create(&req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
 		return
 	}
 
@@ -57,18 +56,37 @@ func (h RequestHandler) Create(c *gin.Context) {
 }
 
 func (h RequestHandler) Read(c *gin.Context) {
-	res, err := h.ctrl.Read()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
+	tokenString := c.GetHeader("Authorization")
+	parts := strings.Split(tokenString, " ")
+	if len(parts) != 2 || parts[0] != "Bearer" {
+		// Handle invalid Authorization header
+		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{Error: "Invalid Authorization header"})
 		return
 	}
-	c.JSON(http.StatusOK, res)
+	token := parts[1]
+	tokenData, err := utility.VerifyJWT(token, "rahasia")
+	if err != nil {
+		//c.JSON(http.StatusConflict, dto.ErrorResponse{Error: ("Invalid Data " + token + err.Error())})
+		c.JSON(http.StatusConflict, dto.ErrorResponse{Error: "Invalid Token"})
+		return
+	}
+	if !(tokenData.IsActive == "true" && tokenData.RoleID < 3) {
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: "admin masih tidak aktif"})
+	} else {
+		res, err := h.ctrl.Read()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, res)
+	}
+
 }
 func (h RequestHandler) ReadID(c *gin.Context) {
 	customerID := c.Param("id")
 	res, err := h.ctrl.ReadID(customerID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, res)
@@ -83,7 +101,7 @@ func (h RequestHandler) Update(c *gin.Context) {
 	fmt.Println(customer)
 	res, err := h.ctrl.Update(customer, customerID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, res)
@@ -92,7 +110,7 @@ func (h RequestHandler) Delete(c *gin.Context) {
 	customerID := c.Param("id")
 	res, err := h.ctrl.Delete(customerID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, res)

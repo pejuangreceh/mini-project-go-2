@@ -161,7 +161,6 @@ func (c Controller) Login(username string, password string) (*dto.AllActorRespon
 	res := dto.ActorDataResponse{
 		ID:         uint8(actors.ID),
 		Username:   actors.Username,
-		Password:   actors.Password,
 		RoleID:     actors.RoleID,
 		IsVerified: actors.IsVerified,
 		IsActive:   actors.IsActive,

@@ -27,3 +27,15 @@ type AllCustomerResponse struct {
 	Message string                 `json:"message"`
 	Data    []CustomerDataResponse `json:"data"`
 }
+type ErrorResponse struct {
+	Error string
+}
+type MyClaimsResponse struct {
+	ID         uint8  `mapstructure:"id"`
+	Username   string `mapstructure:"username"`
+	RoleID     uint8  `mapstructure:"role_id"`
+	IsVerified string `mapstructure:"is_verified"`
+	IsActive   string `mapstructure:"is_active"`
+	Iat        int64  `mapstructure:"iat"`
+	Exp        int64  `mapstructure:"exp"`
+}

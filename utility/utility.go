@@ -2,7 +2,10 @@ package utility
 
 import (
 	"crud_api/dto"
+	"errors"
+	"fmt"
 	"github.com/golang-jwt/jwt"
+	"github.com/mitchellh/mapstructure"
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )
@@ -41,4 +44,26 @@ func GenerateJWT(res dto.ActorDataResponse, key string) (string, error) {
 	return signedToken, nil
 	// Gunakan signedToken seperti yang Anda butuhkan
 	//fmt.Println(signedToken)
+}
+func VerifyJWT(receivedToken, secretKey string) (*dto.MyClaimsResponse, error) {
+	token, err := jwt.Parse(receivedToken, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method")
+		}
+		return []byte(secretKey), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		var myClaims dto.MyClaimsResponse
+
+		err := mapstructure.Decode(claims, &myClaims)
+		if err != nil {
+			return nil, err
+		}
+
+		return &myClaims, nil
+	}
+	return nil, errors.New("Token tidak valid")
 }
