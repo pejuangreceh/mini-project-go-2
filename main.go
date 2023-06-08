@@ -165,8 +165,8 @@ func main() {
 	//Admin
 	AdminPath := "/admin"
 	AdminPathGroup := r.Group(AdminPath, utility.SuperAdminAuth)
-	r.GET("/admins", adminsHandler.Read)
-	r.GET("/admins:id", adminsHandler.ReadID)
+	AdminPathGroup.GET("/", adminsHandler.Read)
+	AdminPathGroup.GET("/:id", adminsHandler.ReadID)
 	AdminPathGroup.POST("", adminsHandler.Create)
 	AdminPathGroup.PUT("/:id", adminsHandler.Update)
 	AdminPathGroup.PUT("/approval/:id", adminsHandler.Approval)

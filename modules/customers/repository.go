@@ -5,28 +5,28 @@ import (
 	"gorm.io/gorm"
 )
 
-type Repository struct {
+type repository struct {
 	db *gorm.DB
 }
 
-func NewRepository(db *gorm.DB) *Repository {
-	return &Repository{db: db}
+func NewRepository(db *gorm.DB) *repository {
+	return &repository{db: db}
 }
 
-func (r Repository) GetAll() ([]entities.Customers, error) {
+func (r repository) GetAll() ([]entities.Customers, error) {
 	var customers []entities.Customers
 	err := r.db.Find(&customers).Error
 	return customers, err
 }
-func (r Repository) Save(customers *entities.Customers) error {
+func (r repository) Save(customers *entities.Customers) error {
 	return r.db.Create(customers).Error
 }
-func (r Repository) FindByID(ID string) ([]entities.Customers, error) {
+func (r repository) FindByID(ID string) ([]entities.Customers, error) {
 	var customers []entities.Customers
 	err := r.db.First(&customers, ID).Error
 	return customers, err
 }
-func (r Repository) UpdateByID(body entities.Customers, ID string) (*entities.Customers, error) {
+func (r repository) UpdateByID(body entities.Customers, ID string) (*entities.Customers, error) {
 	var customers entities.Customers
 	err := r.db.First(&customers, ID).Error
 	customers.FirstName = body.FirstName
@@ -41,7 +41,7 @@ func (r Repository) UpdateByID(body entities.Customers, ID string) (*entities.Cu
 	return &customers, err
 }
 
-func (r Repository) DeleteByID(ID string) (*entities.Customers, error) {
+func (r repository) DeleteByID(ID string) (*entities.Customers, error) {
 	var customers entities.Customers
 	err := r.db.First(&customers, ID).Error
 
@@ -51,4 +51,12 @@ func (r Repository) DeleteByID(ID string) (*entities.Customers, error) {
 		return nil, delete_query
 	}
 	return &customers, err
+}
+
+type Repository interface {
+	GetAll() ([]entities.Customers, error)
+	Save(customers *entities.Customers) error
+	FindByID(ID string) ([]entities.Customers, error)
+	UpdateByID(body entities.Customers, ID string) (*entities.Customers, error)
+	DeleteByID(ID string) (*entities.Customers, error)
 }
