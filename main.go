@@ -3,6 +3,7 @@ package main
 import (
 	"crud_api/modules/account"
 	"crud_api/modules/customers"
+	"crud_api/utility"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
@@ -153,30 +154,24 @@ func main() {
 	r := gin.Default()
 	customersHandler := customers.DefaultRequestHandler(db)
 	adminsHandler := account.DefaultRequestHandler(db)
-	//BasePath := "/"
+	//Customer Route
 	CustomerPath := "/customers"
-	//BasePathGroup := r.Group(BasePath)
-	//CustomerPathGroup := r.Group(CustomerPath, utility.customersHandlerAuth())
-	CustomerPathGroup := r.Group(CustomerPath)
+	CustomerPathGroup := r.Group(CustomerPath, utility.AdminAuth)
 	CustomerPathGroup.GET("/", customersHandler.Read)
 	CustomerPathGroup.GET("/:id", customersHandler.ReadID)
 	CustomerPathGroup.POST("/", customersHandler.Create)
 	CustomerPathGroup.PUT("/:id", customersHandler.Update)
 	CustomerPathGroup.DELETE("/:id", customersHandler.Delete)
-	//Customer
-	//r.GET("/customers", customersHandler.Read)
-	//r.GET("/customers/:id", customersHandler.ReadID)
-	//r.POST("/customers", customersHandler.Create)
-	//r.PUT("/customers/:id", customersHandler.Update)
-	//r.DELETE("/customers/:id", customersHandler.Delete)
 	//Admin
+	AdminPath := "/admin"
+	AdminPathGroup := r.Group(AdminPath, utility.SuperAdminAuth)
 	r.GET("/admins", adminsHandler.Read)
-	r.GET("/admins/:id", adminsHandler.ReadID)
-	r.POST("/admins", adminsHandler.Create)
-	r.PUT("/admins/:id", adminsHandler.Update)
-	r.PUT("/admins-approval/:id", adminsHandler.Approval)
-	r.PUT("/admins-active/:id", adminsHandler.Activate)
-	r.DELETE("/admins/:id", adminsHandler.Delete)
+	r.GET("/admins:id", adminsHandler.ReadID)
+	AdminPathGroup.POST("", adminsHandler.Create)
+	AdminPathGroup.PUT("/:id", adminsHandler.Update)
+	AdminPathGroup.PUT("/approval/:id", adminsHandler.Approval)
+	AdminPathGroup.PUT("/active/:id", adminsHandler.Activate)
+	AdminPathGroup.DELETE("/:id", adminsHandler.Delete)
 	r.POST("/admins/login", adminsHandler.Login)
 
 	//request-handler : menerima request, mengirim response
