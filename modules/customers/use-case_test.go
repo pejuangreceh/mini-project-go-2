@@ -17,18 +17,22 @@ func TestUseCase_Create(t *testing.T) {
 		customer *entities.Customers
 	}
 	err := errors.New("Database Error")
-
-	req := entities.Customers{
+	nilreq := entities.Customers{}
+	reqcase := entities.Customers{
 		Model:     gorm.Model{},
-		FirstName: "Yoii",
+		FirstName: "Yoi",
 		LastName:  "Bro",
 		Email:     "yoibro@gmail.com",
 		Avatar:    "no avatar la",
 	}
 	mockRepository := mocks.NewRepository(t)
 	mockRepository.EXPECT().
-		Save(&req).
+		Save(&nilreq).
 		Return(err).
+		Once()
+	mockRepository.EXPECT().
+		Save(&reqcase).
+		Return(nil).
 		Once()
 
 	tests := []struct {
@@ -39,12 +43,20 @@ func TestUseCase_Create(t *testing.T) {
 	}{
 		// TODO: Add test cases.
 		{
-			name: "error on Get All Data",
+			name: "error on Create Data",
 			fields: fields{
 				repo: mockRepository,
 			},
-			args:    args{&req},
+			args:    args{&nilreq},
 			wantErr: true,
+		},
+		{
+			name: "success on Create Data",
+			fields: fields{
+				repo: mockRepository,
+			},
+			args:    args{&reqcase},
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
@@ -59,43 +71,24 @@ func TestUseCase_Create(t *testing.T) {
 	}
 }
 
-func TestUseCase_Delete(t *testing.T) {
-	type fields struct {
-		repo Repository
-	}
-	type args struct {
-		ID string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *entities.Customers
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			u := UseCase{
-				repo: tt.fields.repo,
-			}
-			got, err := u.Delete(tt.args.ID)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Delete() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Delete() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestUseCase_Read(t *testing.T) {
 	type fields struct {
 		repo Repository
 	}
+	err := errors.New("Database Error")
+	//nilreq := entities.Customers{}
+	//reqcase := entities.Customers{
+	//	Model:     gorm.Model{},
+	//	FirstName: "",
+	//	LastName:  "",
+	//	Email:     "yoibro@gmail.com",
+	//	Avatar:    "no avatar la",
+	//}
+	mockRepository := mocks.NewRepository(t)
+	mockRepository.EXPECT().
+		GetAll().
+		Return(nil, err).
+		Once()
 	tests := []struct {
 		name    string
 		fields  fields
@@ -103,6 +96,12 @@ func TestUseCase_Read(t *testing.T) {
 		wantErr bool
 	}{
 		// TODO: Add test cases.
+		{
+			name:    "gagal menampilkan",
+			fields:  fields{repo: mockRepository},
+			want:    nil,
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -183,6 +182,38 @@ func TestUseCase_Update(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Update() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+func TestUseCase_Delete(t *testing.T) {
+	type fields struct {
+		repo Repository
+	}
+	type args struct {
+		ID string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    *entities.Customers
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			u := UseCase{
+				repo: tt.fields.repo,
+			}
+			got, err := u.Delete(tt.args.ID)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Delete() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Delete() got = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -5,11 +5,12 @@ import (
 	"crud_api/modules/customers"
 	"crud_api/utility"
 	"errors"
+	"log"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"log"
-	"net/http"
 )
 
 type User struct {
@@ -163,7 +164,7 @@ func main() {
 	CustomerPathGroup.PUT("/:id", customersHandler.Update)
 	CustomerPathGroup.DELETE("/:id", customersHandler.Delete)
 	//Admin
-	AdminPath := "/admin"
+	AdminPath := "/admins"
 	AdminPathGroup := r.Group(AdminPath, utility.SuperAdminAuth)
 	AdminPathGroup.GET("/", adminsHandler.Read)
 	AdminPathGroup.GET("/:id", adminsHandler.ReadID)
