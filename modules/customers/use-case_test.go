@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestUseCase_Create(t *testing.T) {
@@ -76,18 +77,24 @@ func TestUseCase_Read(t *testing.T) {
 		repo Repository
 	}
 	err := errors.New("Database Error")
-	//nilreq := entities.Customers{}
-	//reqcase := entities.Customers{
-	//	Model:     gorm.Model{},
-	//	FirstName: "",
-	//	LastName:  "",
-	//	Email:     "yoibro@gmail.com",
-	//	Avatar:    "no avatar la",
-	//}
+	req := []entities.Customers{
+		{
+			Model:     gorm.Model{},
+			FirstName: "Yabes",
+			LastName:  "Ganteng",
+			Email:     "elloyyabest@gmail.com",
+			Avatar:    "no avatar bruh",
+		},
+	}
 	mockRepository := mocks.NewRepository(t)
+	//test gagal
 	mockRepository.EXPECT().
 		GetAll().
 		Return(nil, err).
+		Once()
+	mockRepository.EXPECT().
+		GetAll().
+		Return(req, nil).
 		Once()
 	tests := []struct {
 		name    string
@@ -97,10 +104,16 @@ func TestUseCase_Read(t *testing.T) {
 	}{
 		// TODO: Add test cases.
 		{
-			name:    "gagal menampilkan",
+			name:    "failed",
 			fields:  fields{repo: mockRepository},
 			want:    nil,
 			wantErr: true,
+		},
+		{
+			name:    "success",
+			fields:  fields{repo: mockRepository},
+			want:    req,
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
@@ -127,6 +140,32 @@ func TestUseCase_ReadID(t *testing.T) {
 	type args struct {
 		ID string
 	}
+	err := errors.New("Database Error")
+	nilreq := []entities.Customers{}
+	req := []entities.Customers{
+		{
+			Model: gorm.Model{
+				ID:        1,
+				CreatedAt: time.Time{},
+				UpdatedAt: time.Time{},
+				DeletedAt: gorm.DeletedAt{},
+			},
+			FirstName: "Yabes",
+			LastName:  "Ganteng",
+			Email:     "elloyyabest@gmail.com",
+			Avatar:    "no avatar bruh",
+		},
+	}
+	mockRepository := mocks.NewRepository(t)
+	//test gagal
+	mockRepository.EXPECT().
+		FindByID(nil).
+		Return(nilreq, err).
+		Once()
+	mockRepository.EXPECT().
+		FindByID(1).
+		Return(req, nil).
+		Once()
 	tests := []struct {
 		name    string
 		fields  fields
@@ -135,6 +174,19 @@ func TestUseCase_ReadID(t *testing.T) {
 		wantErr bool
 	}{
 		// TODO: Add test cases.
+		{
+			name:    "failed",
+			fields:  fields{repo: mockRepository},
+			args:    args{},
+			want:    nilreq,
+			wantErr: true,
+		}, {
+			name:    "success",
+			fields:  fields{repo: mockRepository},
+			args:    args{ID: "1"},
+			want:    req,
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -161,6 +213,31 @@ func TestUseCase_Update(t *testing.T) {
 		body entities.Customers
 		ID   string
 	}
+	err := errors.New("ID not insterted")
+	nilreq := entities.Customers{}
+	req := entities.Customers{
+		FirstName: "Yabes",
+		LastName:  "Ganteng",
+		Email:     "elloyyabest@gmail.com",
+		Avatar:    "no avatar bruh",
+	}
+	res := entities.Customers{
+		FirstName: "Yabes",
+		LastName:  "Ganteng",
+		Email:     "elloyyabest@gmail.com",
+		Avatar:    "no avatar bruh",
+	}
+
+	mockRepository := mocks.NewRepository(t)
+	//test gagal
+	mockRepository.EXPECT().
+		UpdateByID(req, "").
+		Return(&nilreq, err).
+		Once()
+	mockRepository.EXPECT().
+		UpdateByID(req, "1").
+		Return(&res, nil).
+		Once()
 	tests := []struct {
 		name    string
 		fields  fields
@@ -169,6 +246,29 @@ func TestUseCase_Update(t *testing.T) {
 		wantErr bool
 	}{
 		// TODO: Add test cases.
+		{
+			name: "fail to update",
+			fields: fields{
+				repo: mockRepository,
+			},
+			args: args{
+				body: req,
+				ID:   "",
+			},
+			want:    &nilreq,
+			wantErr: true,
+		}, {
+			name: "success to update",
+			fields: fields{
+				repo: mockRepository,
+			},
+			args: args{
+				body: req,
+				ID:   "1",
+			},
+			want:    &res,
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -193,6 +293,24 @@ func TestUseCase_Delete(t *testing.T) {
 	type args struct {
 		ID string
 	}
+	err := errors.New("ID not insterted")
+	res := entities.Customers{
+		FirstName: "Yabes",
+		LastName:  "Ganteng",
+		Email:     "elloyyabest@gmail.com",
+		Avatar:    "no avatar bruh",
+	}
+
+	mockRepository := mocks.NewRepository(t)
+	//test gagal
+	mockRepository.EXPECT().
+		DeleteByID("").
+		Return(nil, err).
+		Once()
+	mockRepository.EXPECT().
+		DeleteByID("1").
+		Return(&res, nil).
+		Once()
 	tests := []struct {
 		name    string
 		fields  fields
@@ -201,6 +319,20 @@ func TestUseCase_Delete(t *testing.T) {
 		wantErr bool
 	}{
 		// TODO: Add test cases.
+		{
+			name:    "failed to delete, null id",
+			fields:  fields{repo: mockRepository},
+			args:    args{""},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "successfuly delete",
+			fields:  fields{repo: mockRepository},
+			args:    args{"1"},
+			want:    &res,
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
