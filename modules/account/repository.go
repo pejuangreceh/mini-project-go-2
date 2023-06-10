@@ -8,21 +8,21 @@ import (
 	"gorm.io/gorm"
 )
 
-type Repository struct {
+type repository struct {
 	db *gorm.DB
 }
 
-func NewRepository(db *gorm.DB) *Repository {
-	return &Repository{db: db}
+func NewRepository(db *gorm.DB) *repository {
+	return &repository{db: db}
 }
 
-func (r Repository) GetAll() ([]entities.Actors, error) {
+func (r repository) GetAll() ([]entities.Actors, error) {
 	var actors []entities.Actors
 	err := r.db.Find(&actors).Error
 	return actors, err
 }
 
-func (r Repository) Save(actors *entities.Actors) error {
+func (r repository) Save(actors *entities.Actors) error {
 	pass, _ := utility.HashPassword(actors.Password)
 	actors.Password = pass
 	err := r.db.Create(actors).Error
@@ -37,13 +37,13 @@ func (r Repository) Save(actors *entities.Actors) error {
 	return err
 
 }
-func (r Repository) FindByID(ID string) ([]entities.Actors, error) {
+func (r repository) FindByID(ID string) ([]entities.Actors, error) {
 	var actors []entities.Actors
 	err := r.db.First(&actors, ID).Error
 	return actors, err
 }
 
-func (r Repository) UpdateByID(body entities.Actors, ID string) (*entities.Actors, error) {
+func (r repository) UpdateByID(body entities.Actors, ID string) (*entities.Actors, error) {
 	var actors entities.Actors
 	err := r.db.First(&actors, ID).Error
 	pass, _ := utility.HashPassword(body.Password)
@@ -60,7 +60,7 @@ func (r Repository) UpdateByID(body entities.Actors, ID string) (*entities.Actor
 	return &actors, err
 }
 
-func (r Repository) DeleteByID(ID string) (*entities.Actors, error) {
+func (r repository) DeleteByID(ID string) (*entities.Actors, error) {
 	var actors entities.Actors
 	err := r.db.First(&actors, ID).Error
 
@@ -72,7 +72,7 @@ func (r Repository) DeleteByID(ID string) (*entities.Actors, error) {
 	return &actors, err
 }
 
-func (r Repository) Approval(body entities.Approval, ID string) (*entities.Approval, error) {
+func (r repository) Approval(body entities.Approval, ID string) (*entities.Approval, error) {
 	var approve entities.Approval
 
 	err := r.db.First(&approve, ID).Error
@@ -99,7 +99,7 @@ func (r Repository) Approval(body entities.Approval, ID string) (*entities.Appro
 
 	return &approve, err
 }
-func (r Repository) Activate(body entities.Activate, ID string) (*entities.Activate, error) {
+func (r repository) Activate(body entities.Activate, ID string) (*entities.Activate, error) {
 	var activate entities.Activate
 
 	err := r.db.First(&activate, ID).Error
@@ -124,7 +124,7 @@ func (r Repository) Activate(body entities.Activate, ID string) (*entities.Activ
 	}
 	return &activate, err
 }
-func (r Repository) Login(username, password string) (*entities.Actors, error) {
+func (r repository) Login(username, password string) (*entities.Actors, error) {
 	var actor entities.Actors
 
 	// Retrieve the actor based on the username
@@ -141,4 +141,15 @@ func (r Repository) Login(username, password string) (*entities.Actors, error) {
 
 	// Password is correct, return the actor
 	return &actor, nil
+}
+
+type Repository interface {
+	GetAll() ([]entities.Actors, error)
+	Save(actors *entities.Actors) error
+	FindByID(ID string) ([]entities.Actors, error)
+	UpdateByID(body entities.Actors, ID string) (*entities.Actors, error)
+	DeleteByID(ID string) (*entities.Actors, error)
+	Approval(body entities.Approval, ID string) (*entities.Approval, error)
+	Activate(body entities.Activate, ID string) (*entities.Activate, error)
+	Login(username, password string) (*entities.Actors, error)
 }
