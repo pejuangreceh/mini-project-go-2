@@ -18,6 +18,21 @@ func TestUseCase_Activate(t *testing.T) {
 		body entities.Activate
 		ID   string
 	}
+	err := errors.New("ID not insterted")
+	req := entities.Activate{
+		Model:    gorm.Model{},
+		IsActive: "true",
+	}
+	mockRepository := mocks.NewRepository(t)
+	//test gagal
+	mockRepository.EXPECT().
+		Activate(req, "").
+		Return(nil, err).
+		Once()
+	mockRepository.EXPECT().
+		Activate(req, "1").
+		Return(&req, nil).
+		Once()
 	tests := []struct {
 		name    string
 		fields  fields
@@ -26,6 +41,26 @@ func TestUseCase_Activate(t *testing.T) {
 		wantErr bool
 	}{
 		// TODO: Add test cases.
+		{
+			name:   "failed to activate",
+			fields: fields{repo: mockRepository},
+			args: args{
+				body: req,
+				ID:   "",
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:   "success to activate",
+			fields: fields{repo: mockRepository},
+			args: args{
+				body: req,
+				ID:   "1",
+			},
+			want:    &req,
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -52,6 +87,21 @@ func TestUseCase_Approval(t *testing.T) {
 		body entities.Approval
 		ID   string
 	}
+	err := errors.New("ID not insterted")
+	req := entities.Approval{
+		Model:      gorm.Model{},
+		IsVerified: "true",
+	}
+	mockRepository := mocks.NewRepository(t)
+	//test gagal
+	mockRepository.EXPECT().
+		Approval(req, "").
+		Return(nil, err).
+		Once()
+	mockRepository.EXPECT().
+		Approval(req, "1").
+		Return(&req, nil).
+		Once()
 	tests := []struct {
 		name    string
 		fields  fields
@@ -60,6 +110,26 @@ func TestUseCase_Approval(t *testing.T) {
 		wantErr bool
 	}{
 		// TODO: Add test cases.
+		{
+			name:   "failed to approve",
+			fields: fields{repo: mockRepository},
+			args: args{
+				body: req,
+				ID:   "",
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:   "success to approve",
+			fields: fields{repo: mockRepository},
+			args: args{
+				body: req,
+				ID:   "1",
+			},
+			want:    &req,
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -147,6 +217,24 @@ func TestUseCase_Delete(t *testing.T) {
 	type args struct {
 		ID string
 	}
+	err := errors.New("Error - Failed to delete ")
+	reqcase := entities.Actors{
+		Model:      gorm.Model{},
+		Username:   "admin",
+		Password:   "123456",
+		RoleID:     2,
+		IsVerified: "false",
+		IsActive:   "false",
+	}
+	mockRepository := mocks.NewRepository(t)
+	mockRepository.EXPECT().
+		DeleteByID("").
+		Return(nil, err).
+		Once()
+	mockRepository.EXPECT().
+		DeleteByID("1").
+		Return(&reqcase, nil).
+		Once()
 	tests := []struct {
 		name    string
 		fields  fields
@@ -155,6 +243,24 @@ func TestUseCase_Delete(t *testing.T) {
 		wantErr bool
 	}{
 		// TODO: Add test cases.
+		{
+			name: "Failed to delete",
+			fields: fields{
+				repo: mockRepository,
+			},
+			args:    args{ID: ""},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "Deleted Successfully",
+			fields: fields{
+				repo: mockRepository,
+			},
+			args:    args{"1"},
+			want:    &reqcase,
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -168,40 +274,6 @@ func TestUseCase_Delete(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Delete() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestUseCase_Login(t *testing.T) {
-	type fields struct {
-		repo Repository
-	}
-	type args struct {
-		username string
-		password string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *entities.Actors
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			u := UseCase{
-				repo: tt.fields.repo,
-			}
-			got, err := u.Login(tt.args.username, tt.args.password)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Login() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Login() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -362,7 +434,6 @@ func TestUseCase_Update(t *testing.T) {
 		IsVerified: "false",
 		IsActive:   "false",
 	}
-
 	mockRepository := mocks.NewRepository(t)
 	//test gagal
 	mockRepository.EXPECT().
@@ -421,6 +492,78 @@ func TestUseCase_Update(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Update() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestUseCase_Login(t *testing.T) {
+	type fields struct {
+		repo Repository
+	}
+	type args struct {
+		username string
+		password string
+	}
+	err := errors.New("failed to login")
+	req := entities.Actors{
+		Username:   "admin",
+		Password:   "123456",
+		RoleID:     2,
+		IsVerified: "true",
+		IsActive:   "true",
+	}
+	mockRepository := mocks.NewRepository(t)
+	//test gagal
+	mockRepository.EXPECT().
+		Login("", "").
+		Return(nil, err).
+		Once()
+	mockRepository.EXPECT().
+		Login("admin", "123456").
+		Return(&req, nil).
+		Once()
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    *entities.Actors
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{
+			name:   "failed to login",
+			fields: fields{repo: mockRepository},
+			args: args{
+				username: "",
+				password: "",
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:   "login success",
+			fields: fields{repo: mockRepository},
+			args: args{
+				username: "admin",
+				password: "123456",
+			},
+			want:    &req,
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			u := UseCase{
+				repo: tt.fields.repo,
+			}
+			got, err := u.Login(tt.args.username, tt.args.password)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Login() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Login() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
