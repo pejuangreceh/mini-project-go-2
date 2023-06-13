@@ -26,9 +26,10 @@ var db *gorm.DB
 var err error
 
 func initDB() (*gorm.DB, error) {
-	//default
-	dsn := "root@tcp(localhost:3306)/db_project?parseTime=true"
-	//dsn := "root:password@tcp(db:3306)/app?parseTime=true"
+	//default local
+	//dsn := "root@tcp(localhost:3306)/db_project?parseTime=true"
+	//production
+	dsn := "root:@tcp(db:3306)/app?parseTime=true"
 	return gorm.Open(mysql.Open(dsn), &gorm.Config{})
 }
 
